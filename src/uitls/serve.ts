@@ -5,7 +5,7 @@ import type {
   AxiosResponse
 } from "axios";
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "/",
+  baseURL: "https://chartaitest.onrender.com/",
   timeout: 5000
 });
 // 添加请求拦截器

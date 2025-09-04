@@ -11,7 +11,7 @@ let form = reactive({
 
 const handleSubmit = async () => {
   let data = {
-    api_key: "",
+    api_key: form.api_key,
     content: form.content
   };
   let res = await submitContext(data);
@@ -27,7 +27,7 @@ const handleSubmit = async () => {
     <input type="text" v-model="form.api_key" placeholder="请输入api_key" />
   </div>
   <div>
-    <input type="text" v-model="form.content" placeholder="请输入内容" />
+    <textarea type="text" v-model="form.content" placeholder="请输入内容" />
   </div>
   <button @click="handleSubmit">提交</button>
 </template>
