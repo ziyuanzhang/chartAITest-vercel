@@ -12,7 +12,9 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": "https://chartaitest.onrender.com"
+      // "/api": "https://chartaitest.onrender.com"
+      "/api": "http://0.0.0.0:10000/",
+      "/events": "http://0.0.0.0:10000/"
     }
   }
 });
