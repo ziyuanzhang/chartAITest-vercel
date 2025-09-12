@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
+import { submitContext } from "@/api/chat_second";
 defineOptions({
   name: "Chat_second"
 });
@@ -48,25 +49,26 @@ const sendMessage = async () => {
 
   try {
     // 1. 启动会话 (POST)
-    const startResponse = await fetch("http://127.0.0.1:8000/api/chat/start", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: message })
-    });
+    const startResponse = await submitContext({ message: message });
 
-    if (!startResponse.ok) {
-      throw new Error(`Failed to start session: ${startResponse.status}`);
+    // fetch("http://127.0.0.1:8000/api/chat/start", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ message: message })
+    // });
+
+    if (startResponse.code !== "success") {
+      throw new Error(`Failed to start session: ${startResponse.message}`);
     }
-
-    const { stream_id } = await startResponse.json();
-    currentStreamId = stream_id;
+    // currentStreamId = startResponse.data.stream_id;
+    // console.log("当前流ID设置为:", currentStreamId); // 读取并使用
 
     // 显示AI正在输入的状态
     currentAiMessageDiv = addMessage("ai", "", true);
 
     // 2. 连接流式响应 (GET + EventSource)
     eventSource = new EventSource(
-      `http://127.0.0.1:8000/api/chat/stream/${stream_id}`
+      `/api/chat/stream/${startResponse.data.stream_id}`
     );
 
     eventSource.onmessage = function (event) {
