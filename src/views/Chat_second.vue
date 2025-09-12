@@ -70,6 +70,7 @@ const sendMessage = async () => {
     );
 
     eventSource.onmessage = function (event) {
+      if (!chatBox.value) return;
       try {
         const data = JSON.parse(event.data);
 
@@ -134,30 +135,29 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>
-    <div class="chat-container">
-      <div id="chatBox" ref="chatBox">
-        <div class="message system-message">
-          欢迎使用AI聊天助手！请输入您的问题开始对话。
-        </div>
+  <div class="chat-container">
+    <div class="chatBox" ref="chatBox">
+      <div class="message system-message">
+        欢迎使用AI聊天助手！请输入您的问题开始对话。
       </div>
+    </div>
 
-      <div class="input-area">
-        <input
-          type="text"
-          placeholder="输入您的消息..."
-          v-model="inputBox.val"
-          :disabled="inputBox.disabled"
-        />
-        <button
-          id="sendBtnDisabled"
-          @click="sendMessage"
-          @keypress="handleKeypress"
-          :disabled="sendBtnDisabled"
-        >
-          发送
-        </button>
-      </div>
+    <div class="input-area">
+      <textarea
+        placeholder="输入您的消息..."
+        v-model="inputBox.val"
+        :disabled="inputBox.disabled"
+        class="inputBox"
+        rows="5"
+      />
+      <button
+        id="sendBtnDisabled"
+        @click="sendMessage"
+        @keypress="handleKeypress"
+        :disabled="sendBtnDisabled"
+      >
+        发送
+      </button>
     </div>
   </div>
 </template>
@@ -167,60 +167,62 @@ onUnmounted(() => {
   border: 1px solid #e1e5e9;
   border-radius: 12px;
   overflow: hidden;
+  .chatBox {
+    height: 400px;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f8f9fa;
+    .message {
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      max-width: 80%;
+    }
+    .user-message {
+      background: #007bff;
+      color: white;
+      margin-left: auto;
+      text-align: right;
+    }
+    .ai-message {
+      background: white;
+      border: 1px solid #e1e5e9;
+    }
+    .system-message {
+      background: #fff3cd;
+      color: #856404;
+      text-align: center;
+      font-size: 14px;
+    }
+  }
 }
-#chatBox {
-  height: 400px;
-  overflow-y: auto;
-  padding: 20px;
-  background: #f8f9fa;
-}
-.message {
-  margin-bottom: 16px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  max-width: 80%;
-}
-.user-message {
-  background: #007bff;
-  color: white;
-  margin-left: auto;
-  text-align: right;
-}
-.ai-message {
-  background: white;
-  border: 1px solid #e1e5e9;
-}
-.system-message {
-  background: #fff3cd;
-  color: #856404;
-  text-align: center;
-  font-size: 14px;
-}
+
 .input-area {
   display: flex;
   padding: 16px;
   background: white;
   border-top: 1px solid #e1e5e9;
+  .inputBox {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-right: 12px;
+  }
+  button {
+    padding: 12px 24px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
 }
-#inputBox {
-  flex: 1;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  margin-right: 12px;
-}
-button {
-  padding: 12px 24px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
+
 .typing-indicator {
   display: inline-block;
   margin-left: 4px;
