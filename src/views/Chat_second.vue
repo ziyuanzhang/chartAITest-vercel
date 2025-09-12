@@ -3,14 +3,18 @@ import { onMounted, onUnmounted, ref } from "vue";
 defineOptions({
   name: "Chat_second"
 });
-const chatBox = ref();
-const inputBox = ref();
-const sendButton = ref();
+const chatBox = ref<HTMLDivElement>();
+const inputBox = ref({
+  val: "",
+  disabled: false
+});
+const sendBtnDisabled = ref<boolean>(false);
 let eventSource: EventSource | null = null;
 let currentStreamId = null;
-let currentAiMessageDiv: HTMLDivElement | null = null;
+let currentAiMessageDiv: HTMLDivElement | undefined = undefined;
 
 const addMessage = (role: string, text: string, isTyping = false) => {
+  if (!chatBox.value) return;
   const messageDiv = document.createElement("div");
   messageDiv.className = `message ${role}-message`;
   if (isTyping) {
@@ -23,6 +27,7 @@ const addMessage = (role: string, text: string, isTyping = false) => {
   return messageDiv;
 };
 const addSystemMessage = (text: string) => {
+  if (!chatBox.value) return;
   const messageDiv = document.createElement("div");
   messageDiv.className = "message system-message";
   messageDiv.textContent = text;
@@ -30,12 +35,13 @@ const addSystemMessage = (text: string) => {
   chatBox.value.scrollTop = chatBox.value.scrollHeight;
 };
 const sendMessage = async () => {
-  const message = inputBox.value.trim();
+  if (!chatBox.value) return;
+  const message = inputBox.value.val.trim();
   if (!message || eventSource) return;
 
-  inputBox.value = "";
+  inputBox.value.val = "";
   inputBox.value.disabled = true;
-  sendButton.value.disabled = true;
+  sendBtnDisabled.value = true;
 
   // 显示用户消息
   addMessage("user", message);
@@ -108,8 +114,7 @@ const closeConnection = () => {
   }
   currentStreamId = null;
   inputBox.value.disabled = false;
-  sendButton.value.disabled = false;
-  inputBox.value.focus();
+  sendBtnDisabled.value = false;
 };
 // 支持回车发送
 const handleKeypress = (e: KeyboardEvent) => {
@@ -121,8 +126,7 @@ const handleKeypress = (e: KeyboardEvent) => {
 
 onMounted(() => {
   inputBox.value.disabled = false;
-  sendButton.value.disabled = false;
-  inputBox.value.focus();
+  sendBtnDisabled.value = false;
 });
 onUnmounted(() => {
   closeConnection();
@@ -141,17 +145,15 @@ onUnmounted(() => {
       <div class="input-area">
         <input
           type="text"
-          id="inputBox"
           placeholder="输入您的消息..."
-          disabled
-          ref="inputBox"
+          v-model="inputBox.val"
+          :disabled="inputBox.disabled"
         />
         <button
-          id="sendButton"
+          id="sendBtnDisabled"
           @click="sendMessage"
           @keypress="handleKeypress"
-          disabled
-          ref="sendButton"
+          :disabled="sendBtnDisabled"
         >
           发送
         </button>
