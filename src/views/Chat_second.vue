@@ -48,7 +48,9 @@ const sendMessage = async () => {
 
   try {
     // 1. 启动会话 (POST)
-    const startResponse = await submitContext({ message: message });
+    const startResponse = await submitContext({
+      message: message
+    });
 
     // fetch("http://127.0.0.1:8000/api/chat/start", {
     //   method: "POST",
