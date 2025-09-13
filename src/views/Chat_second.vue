@@ -11,7 +11,6 @@ const inputBox = ref({
 });
 const sendBtnDisabled = ref<boolean>(false);
 let eventSource: EventSource | null = null;
-let currentStreamId = null;
 let currentAiMessageDiv: HTMLDivElement | undefined = undefined;
 
 const addMessage = (role: string, text: string, isTyping = false) => {
@@ -60,8 +59,6 @@ const sendMessage = async () => {
     if (startResponse.code !== "success") {
       throw new Error(`Failed to start session: ${startResponse.message}`);
     }
-    // currentStreamId = startResponse.data.stream_id;
-    // console.log("当前流ID设置为:", currentStreamId); // 读取并使用
 
     // 显示AI正在输入的状态
     currentAiMessageDiv = addMessage("ai", "", true);
@@ -107,7 +104,7 @@ const sendMessage = async () => {
   } catch (error) {
     console.error("Error:", error);
     closeConnection();
-    addSystemMessage(`出错: ${error.message}`);
+    addSystemMessage(`出错: ${error}`);
   }
 };
 const closeConnection = () => {
@@ -115,7 +112,7 @@ const closeConnection = () => {
     eventSource.close();
     eventSource = null;
   }
-  currentStreamId = null;
+
   inputBox.value.disabled = false;
   sendBtnDisabled.value = false;
 };

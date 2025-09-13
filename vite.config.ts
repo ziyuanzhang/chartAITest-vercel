@@ -1,13 +1,13 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import path from "path";
+import { fileURLToPath, URL } from "node:url";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src")
+      "@": fileURLToPath(new URL("./src", import.meta.url))
     }
   },
   server: {
@@ -17,15 +17,16 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq, req, res) => {
-            console.log("Proxying SSE request:", req.url);
+          proxy.on("proxyReq", (proxyReq) => {
+            //console.log("Proxying SSE request:", req.url, res);
             // 确保正确的 SSE headers
             proxyReq.setHeader("Accept", "text/event-stream");
             proxyReq.setHeader("Cache-Control", "no-cache");
             proxyReq.setHeader("Connection", "keep-alive");
           });
 
-          proxy.on("proxyRes", (proxyRes, req, res) => {
+          proxy.on("proxyRes", (proxyRes) => {
+            //console.log("Proxying SSE proxyRes:", req.url, res);
             // 确保响应头正确
             proxyRes.headers["access-control-allow-origin"] = "*";
             proxyRes.headers["access-control-allow-credentials"] = "true";
